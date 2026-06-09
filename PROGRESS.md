@@ -4,17 +4,20 @@ Tracks the milestones from `AGENT_START_README.md` §14. Update as work lands.
 
 Legend: ✅ done · 🟡 partial · ⬜ not started
 
-## M0 — Scaffold + prove HyperFrames · 🟡
+## M0 — Scaffold + prove HyperFrames · ✅
 
 - ✅ pnpm + Node 22 monorepo (`pnpm-workspace.yaml`, shared `tsconfig.base.json`).
-- ✅ Both apps scaffolded: `apps/render-server` (working compile pipeline + HTTP
-  service), `apps/studio` (placeholder slot for the M4 editor).
-- ✅ Toolchain verified on this machine: Node v22, pnpm 10, **FFmpeg 6.1** installed.
-- ⬜ Install the HyperFrames packages + agent skills and render an **official
-  example to a playable MP4** end-to-end. The seam is in place
-  (`apps/render-server/src/render.ts` dynamically loads `@hyperframes/producer`
-  and fails with actionable next steps); wiring the real capture/encode is the
-  remaining M0 task.
+- ✅ Both apps scaffolded: `apps/render-server` (working compile **+ render**
+  pipeline + HTTP service), `apps/studio` (placeholder slot for the M4 editor).
+- ✅ Toolchain verified: Node v22, pnpm 10, **FFmpeg 6.1**, **Chrome headless
+  shell** (via `hyperframes browser ensure`), HyperFrames v0.6.84 + agent skills.
+- ✅ Rendered an **official HyperFrames example to a playable MP4** end-to-end
+  (`hyperframes init _smoketest --example swiss-grid` → `render` → 79 KB MP4).
+- ✅ Verified the **compiler against the installed v0.6.84 contract** (skill +
+  scaffold): single master composition, `class="clip"` on every timed element,
+  root `data-start`/`data-duration`, `data-composition-id` only on the root,
+  GSAP **vendored locally** (the CDN is blocked in render and offline is the
+  rule — this also removed a 45 s headless stall).
 
 ## M1 — Schema + compiler + render route · 🟡
 
@@ -27,11 +30,13 @@ Legend: ✅ done · 🟡 partial · ⬜ not started
   allocator, themed enter/exit + per-block internal animation folded into one
   paused GSAP timeline (`window.__timelines[id]`), variable resolution
   (whole-string + inline). **Snapshot + unit tests, 17 tests.**
-- ✅ `examples/results-demo.json` — hand-written 2-scene project; validates and
-  compiles deterministically (verified in tests + via the CLI).
-- 🟡 `/render` — `POST /render` compiles a project to `composition.html` on
-  disk; the **MP4 encode** step and **SSE** progress are pending the M0 render
-  wiring.
+- ✅ `examples/results-demo.json` — hand-written 2-scene project; validates,
+  compiles deterministically, lints clean (0/0), and **renders to MP4** with
+  correct layout, theme, fonts, resolved variables, and animation (verified by
+  frame extraction).
+- ✅ `/render` — `POST /render` compiles **and renders** a project to MP4 via the
+  HyperFrames CLI (lint-before-render with `--strict`); `POST /compile` is
+  compile-only. **SSE** progress streaming is the remaining nice-to-have.
 
 ## M2 — Themes · 🟡
 
@@ -73,9 +78,18 @@ Presets/aspect ratios modeled in the schema; export + queue UI not started.
 
 ```
 pnpm install
-pnpm -r typecheck      # 4 packages clean
+pnpm -r typecheck      # 5 packages clean
 pnpm test              # 46 tests passing (schema + compiler)
+
+# compile only → a render-ready HyperFrames project dir (index.html + gsap):
 pnpm --filter @demoforge/render-server compile \
   "$PWD/examples/results-demo.json" "$PWD/projects/results-demo/compiled"
-# → projects/results-demo/compiled/composition.html (14 KB, glass-neon)
+
+# compile + render to MP4 (lint-strict, ~15s at draft on 4 cores):
+pnpm --filter @demoforge/render-server render \
+  "$PWD/examples/results-demo.json" "$PWD/projects/results-demo/render" draft
+# → projects/results-demo/render/results-demo.mp4  (1920×1080, glass-neon, animated)
 ```
+
+One-time render prerequisites: `npx hyperframes browser ensure` (downloads the
+headless Chrome shell) and the Chrome system libraries (`libnss3`, `libgbm1`, …).

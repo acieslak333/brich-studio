@@ -1,40 +1,77 @@
+import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
+
 /**
- * The MP4 render seam (§12). Compiling a project produces a HyperFrames
- * composition (HTML); turning that into an MP4 is `@hyperframes/producer`'s job
- * (headless Chrome seeks frames → FFmpeg encodes).
+ * MP4 render (§12). A compiled project dir (index.html + gsap.min.js + assets)
+ * is rendered by the HyperFrames toolchain: headless Chrome seeks frames →
+ * FFmpeg encodes. We drive the official `hyperframes` CLI (which uses
+ * `@hyperframes/producer` internally) — the documented, reproducible path —
+ * rather than coupling to the producer's programmatic surface.
  *
- * This is intentionally a thin, clearly-marked seam: it dynamically loads the
- * producer so the rest of the server runs fully offline, and fails with an
- * actionable message until the HyperFrames toolchain is wired (M0 DoD).
+ * `--strict` makes the CLI fail on lint errors, satisfying the
+ * "lint/inspect before render" requirement (§12).
  */
 
+const require = createRequire(import.meta.url);
+
 export interface RenderToMp4Args {
-  htmlPath: string;
+  /** Directory containing the compiled index.html (and gsap.min.js). */
+  projectDir: string;
+  /** Absolute output path for the rendered file. */
   outPath: string;
-  width: number;
-  height: number;
-  fps: number;
+  quality?: "draft" | "standard" | "high";
+  fps?: 24 | 30 | 60;
+  format?: "mp4" | "webm";
+  /** Receives stdout/stderr lines from the renderer (for SSE/progress). */
+  onLog?: (line: string) => void;
 }
 
-export async function renderToMp4(_args: RenderToMp4Args): Promise<string> {
-  let producer: unknown;
-  try {
-    // @ts-expect-error — optional peer; not installed until M0 render wiring.
-    producer = await import("@hyperframes/producer");
-  } catch {
-    throw new Error(
-      [
-        "MP4 render is not wired yet.",
-        "Next step (M0 DoD): install the HyperFrames toolchain and implement this seam:",
-        "  pnpm add -w @hyperframes/producer @hyperframes/engine @hyperframes/core",
-        "  npx skills add heygen-com/hyperframes   # read the production patterns",
-        "Then run `hyperframes lint` on the composition and call the producer's",
-        "capture+encode pipeline with the compiled composition.html.",
-      ].join("\n"),
-    );
-  }
-  // Once the producer API is confirmed against the installed package, drive it
-  // here with _args (capture frames → encode → audio mix → write outPath).
-  void producer;
-  throw new Error("renderToMp4: producer detected but pipeline not implemented yet.");
+/** Render a compiled project directory to an MP4/WebM. Resolves to `outPath`. */
+export async function renderToMp4(args: RenderToMp4Args): Promise<string> {
+  const cli = resolveHyperframesCli();
+  const argv = [
+    cli,
+    "render",
+    "--output",
+    args.outPath,
+    "--quality",
+    args.quality ?? "standard",
+    "--strict",
+  ];
+  if (args.fps) argv.push("--fps", String(args.fps));
+  if (args.format && args.format !== "mp4") argv.push("--format", args.format);
+
+  await runNode(argv, args.projectDir, args.onLog);
+  return args.outPath;
+}
+
+/** Path to the installed `hyperframes` CLI entry (`dist/cli.js`). */
+function resolveHyperframesCli(): string {
+  const pkgJson = require.resolve("hyperframes/package.json");
+  return join(dirname(pkgJson), "dist", "cli.js");
+}
+
+function runNode(
+  argv: string[],
+  cwd: string,
+  onLog?: (line: string) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, argv, {
+      cwd,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const pipe = (buf: Buffer): void => {
+      const text = buf.toString();
+      if (onLog) onLog(text);
+    };
+    child.stdout.on("data", pipe);
+    child.stderr.on("data", pipe);
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`hyperframes render exited with code ${code}`));
+    });
+  });
 }

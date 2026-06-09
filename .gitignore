@@ -25,6 +25,13 @@ projects/
 # hyperframes smoke-test scratch dir
 _smoketest/
 
+# installed third-party agent skills (reinstall: npx skills add heygen-com/hyperframes)
+.agents/
+skills-lock.json
+
+# vendored render dependency (copied in by the render pipeline)
+**/gsap.min.js
+
 # env & secrets (server-side only, never committed)
 .env
 .env.*

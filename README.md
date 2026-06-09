@@ -11,15 +11,19 @@ produces a video per model / run / checkpoint.
 
 ## Status
 
-Early foundation in place (M0/M1): the **schema** (project model) and the
-**compiler** (project → HyperFrames composition) are built, tested, and
-deterministic. The MP4 render seam is scaffolded and awaits the HyperFrames
-toolchain. See `PROGRESS.md` for the per-milestone breakdown.
+Foundation working end-to-end (M0 ✅, M1 mostly ✅): the **schema** (project
+model) and **compiler** (project → HyperFrames composition) are built, tested,
+and deterministic, and a project **renders to a real MP4** through the
+HyperFrames toolchain (lint-clean, animated, fonts embedded, variables
+resolved). See `PROGRESS.md` for the per-milestone breakdown.
 
 ## Requirements
 
 - Node.js **22+**, **pnpm** 10+
 - **FFmpeg** (for the render step)
+- For rendering: headless Chrome (`npx hyperframes browser ensure`) and its
+  system libraries (`libnss3`, `libgbm1`, `libatk1.0-0`, …). GSAP is vendored
+  locally by the pipeline, so rendering is offline/deterministic.
 
 ## Quickstart
 
@@ -28,13 +32,19 @@ pnpm install
 pnpm -r typecheck      # typecheck all packages
 pnpm test              # run the test suite (schema + compiler)
 
-# compile the example project to a HyperFrames composition (HTML):
+# compile the example to a render-ready HyperFrames project (index.html + gsap):
 pnpm --filter @demoforge/render-server compile \
   "$PWD/examples/results-demo.json" "$PWD/projects/results-demo/compiled"
-# → projects/results-demo/compiled/composition.html
+
+# compile + render to MP4:
+pnpm --filter @demoforge/render-server render \
+  "$PWD/examples/results-demo.json" "$PWD/projects/results-demo/render" draft
+# → projects/results-demo/render/results-demo.mp4
 
 # or run the render service:
-pnpm --filter @demoforge/render-server start   # POST /render { "projectPath": "..." }
+pnpm --filter @demoforge/render-server start
+#   POST /compile { "projectPath": "..." }            → composition only
+#   POST /render  { "projectPath": "...", "quality": "draft" }  → MP4
 ```
 
 ## Layout

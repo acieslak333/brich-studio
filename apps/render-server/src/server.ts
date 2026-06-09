@@ -1,5 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { compileToDisk } from "./pipeline.js";
+import { compileToDisk, renderProject } from "./pipeline.js";
 
 /**
  * Minimal render service (§12). Exposes a health check and a `/render` endpoint
@@ -34,25 +34,36 @@ const server = createServer(async (req, res) => {
       return json(res, 200, { ok: true, service: "demoforge-render-server" });
     }
 
-    // POST /render { projectPath: string, outDir?: string }
-    if (req.method === "POST" && req.url === "/render") {
+    // POST /compile { projectPath, outDir? } — compile only (no MP4 encode)
+    if (req.method === "POST" && req.url === "/compile") {
       const body = await readBody(req);
       const { projectPath, outDir } = JSON.parse(body || "{}") as {
         projectPath?: string;
         outDir?: string;
       };
-      if (!projectPath) {
-        return json(res, 400, { error: "projectPath is required" });
-      }
-      const result = compileToDisk(projectPath, outDir);
-      return json(res, 200, {
-        ok: true,
-        ...result,
-        note: "Composition compiled. MP4 encode (renderToMp4) is the next seam (§12).",
-      });
+      if (!projectPath) return json(res, 400, { error: "projectPath is required" });
+      return json(res, 200, { ok: true, ...compileToDisk(projectPath, outDir) });
     }
 
-    return json(res, 404, { error: "not found", routes: ["/health", "POST /render"] });
+    // POST /render { projectPath, outDir?, quality?, fps?, format? } — compile + MP4
+    if (req.method === "POST" && req.url === "/render") {
+      const body = await readBody(req);
+      const opts = JSON.parse(body || "{}") as {
+        projectPath?: string;
+        outDir?: string;
+        quality?: "draft" | "standard" | "high";
+        fps?: 24 | 30 | 60;
+        format?: "mp4" | "webm";
+      };
+      if (!opts.projectPath) return json(res, 400, { error: "projectPath is required" });
+      const result = await renderProject(opts.projectPath, opts);
+      return json(res, 200, { ok: true, ...result });
+    }
+
+    return json(res, 404, {
+      error: "not found",
+      routes: ["/health", "POST /compile", "POST /render"],
+    });
   } catch (err) {
     return json(res, 500, { error: err instanceof Error ? err.message : String(err) });
   }

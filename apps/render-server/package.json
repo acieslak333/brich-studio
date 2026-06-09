@@ -5,17 +5,22 @@
   "type": "module",
   "scripts": {
     "compile": "tsx src/cli.ts",
+    "render": "tsx src/cli-render.ts",
     "start": "tsx src/server.ts",
     "dev": "tsx watch src/server.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@demoforge/compiler": "workspace:*",
-    "@demoforge/schema": "workspace:*"
+    "@demoforge/schema": "workspace:*",
+    "@hyperframes/core": "^0.6.84",
+    "@hyperframes/producer": "^0.6.84",
+    "gsap": "^3.15.0",
+    "hyperframes": "^0.6.84"
   },
   "devDependencies": {
+    "@types/node": "^22.10.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3",
-    "@types/node": "^22.10.0"
+    "typescript": "^5.6.3"
   }
 }
