@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "results-demo",
+  "name": "Model v2 — Results",
+  "theme": "glass-neon",
+  "output": { "width": 1920, "height": 1080, "fps": 30, "format": "mp4", "aspect": "16:9" },
+  "assets": [],
+  "variables": [
+    { "name": "modelName", "type": "string", "default": "bert-base-v2" }
+  ],
+  "sequence": [
+    {
+      "id": "s-title",
+      "name": "Title",
+      "durationSec": 3,
+      "background": { "kind": "gradient", "from": "#0a0b14", "to": "#1a1140", "angleDeg": 160 },
+      "layout": { "columns": 1, "rows": 1, "gapPx": 48 },
+      "panels": [
+        {
+          "id": "title",
+          "colStart": 1, "colSpan": 1, "rowStart": 1, "rowSpan": 1,
+          "startSec": 0, "durationSec": 3, "enter": "fade",
+          "component": {
+            "type": "text",
+            "props": { "variant": "title", "align": "left" },
+            "data": { "title": "{{modelName}} Results", "subtitle": "+9 F1 over baseline · 25% lower latency" }
+          }
+        }
+      ]
+    },
+    {
+      "id": "s-results",
+      "name": "Results",
+      "durationSec": 7,
+      "layout": { "columns": 2, "rows": 2, "gapPx": 24 },
+      "panels": [
+        {
+          "id": "chart",
+          "colStart": 1, "colSpan": 1, "rowStart": 1, "rowSpan": 1,
+          "startSec": 0, "durationSec": 7, "enter": "slide-up",
+          "component": {
+            "type": "chart",
+            "props": { "kind": "bar", "title": "F1 by checkpoint" },
+            "data": { "series": [ { "name": "F1", "points": [
+              { "x": "1k", "y": 0.71 }, { "x": "5k", "y": 0.79 },
+              { "x": "10k", "y": 0.84 }, { "x": "20k", "y": 0.88 }
+            ] } ] }
+          }
+        },
+        {
+          "id": "table",
+          "colStart": 2, "colSpan": 1, "rowStart": 1, "rowSpan": 1,
+          "startSec": 0.4, "durationSec": 6.6, "enter": "fade",
+          "component": {
+            "type": "table",
+            "props": { "title": "Per-class F1", "showDiff": true, "columns": [
+              { "key": "label", "label": "Class", "align": "left" },
+              { "key": "f1", "label": "F1", "align": "right" }
+            ] },
+            "data": { "baselineRowIndex": 0, "rows": [
+              { "label": "baseline", "f1": 0.79 },
+              { "label": "PERSON", "f1": 0.86 },
+              { "label": "ORG", "f1": 0.80 },
+              { "label": "LOC", "f1": 0.91 }
+            ] }
+          }
+        },
+        {
+          "id": "compare",
+          "colStart": 1, "colSpan": 1, "rowStart": 2, "rowSpan": 1,
+          "startSec": 0.8, "durationSec": 6.2, "enter": "slide-up",
+          "component": {
+            "type": "comparison",
+            "props": { "mode": "metrics", "title": "Baseline vs v2", "beforeLabel": "v1", "afterLabel": "v2" },
+            "data": { "metrics": [
+              { "label": "Accuracy", "before": 0.82, "after": 0.90 },
+              { "label": "F1", "before": 0.79, "after": 0.88 },
+              { "label": "Latency", "before": 240, "after": 180, "unit": "ms", "higherIsBetter": false }
+            ] }
+          }
+        },
+        {
+          "id": "term",
+          "colStart": 2, "colSpan": 1, "rowStart": 2, "rowSpan": 1,
+          "startSec": 1.2, "durationSec": 5.8, "enter": "fade",
+          "component": {
+            "type": "terminal",
+            "props": { "prompt": "$", "title": "eval.sh" },
+            "data": { "steps": [
+              { "command": "python eval.py --model {{modelName}}", "output": "f1=0.88  acc=0.90  lat=180ms", "exitCode": 0 }
+            ] }
+          }
+        }
+      ]
+    }
+  ]
+}

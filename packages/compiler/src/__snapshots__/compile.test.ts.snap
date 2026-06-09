@@ -1,0 +1,188 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compile > matches the composition snapshot 1`] = `
+"<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sample Results Video</title>
+<style>
+.df-stage {
+  --df-accent: #e4002b;
+  --df-accent-fg: #ffffff;
+  --df-bg: #ffffff;
+  --df-border: #111111;
+  --df-border-width: 1px;
+  --df-fg: #111111;
+  --df-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --df-font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --df-grid-line: rgba(0,0,0,0.08);
+  --df-muted: #6b6b6b;
+  --df-neg: #c2261d;
+  --df-pos: #1b7f3b;
+  --df-radius: 0px;
+  --df-shadow: none;
+  --df-space: 16px;
+  --df-surface: #ffffff;
+  --df-text-2xl: 72px;
+  --df-text-base: 18px;
+  --df-text-lg: 28px;
+  --df-text-sm: 15px;
+  --df-text-xl: 44px;
+  --df-text-xs: 13px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+.df-stage {
+  font-family: var(--df-font-sans);
+  color: var(--df-fg);
+  background: var(--df-bg);
+}
+.df-scene { position: absolute; inset: 0; display: grid; }
+.df-panel {
+  position: relative; overflow: hidden;
+  background: var(--df-surface);
+  border: var(--df-border-width) solid var(--df-border);
+  border-radius: var(--df-radius);
+  box-shadow: var(--df-shadow);
+  padding: var(--df-space);
+  min-height: 0; min-width: 0;
+}
+
+/* text */
+.df-text { display: flex; flex-direction: column; gap: 8px; height: 100%; justify-content: center; }
+.df-title { font-size: var(--df-text-2xl); font-weight: 800; line-height: 1.02; letter-spacing: -0.02em; }
+.df-subtitle { font-size: var(--df-text-lg); color: var(--df-muted); }
+.df-bullets { margin: 8px 0 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 6px; }
+.df-bullet { font-size: var(--df-text-base); }
+.df-quote { font-size: var(--df-text-xl); font-style: italic; }
+.df-attribution { color: var(--df-muted); font-size: var(--df-text-sm); }
+
+/* chart */
+.df-chart { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+.df-chart-title { font-size: var(--df-text-sm); color: var(--df-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.df-chart-plot { flex: 1; display: flex; align-items: flex-end; gap: 12px; }
+.df-bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; }
+.df-bars { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
+.df-bar {
+  width: 100%; max-width: 64px;
+  background: var(--df-bar-color, var(--df-accent));
+  transform-origin: bottom center;
+  display: flex; align-items: flex-start; justify-content: center;
+  position: relative;
+}
+.df-bar-label { position: absolute; top: -1.4em; font-size: var(--df-text-xs); color: var(--df-fg); }
+.df-axis-x { font-size: var(--df-text-xs); color: var(--df-muted); }
+.df-chart-svg { flex: 1; width: 100%; }
+.df-line { fill: none; stroke: var(--df-accent); stroke-width: 2; stroke-dasharray: 1000; vector-effect: non-scaling-stroke; }
+.df-area { fill: var(--df-accent); opacity: 0.18; }
+.df-counter { font-size: var(--df-text-2xl); font-weight: 800; color: var(--df-accent); }
+
+/* table */
+.df-table-wrap { height: 100%; overflow: hidden; }
+.df-table { width: 100%; border-collapse: collapse; font-size: var(--df-text-sm); }
+.df-table-title { text-align: left; font-size: var(--df-text-sm); color: var(--df-muted); padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+.df-th { padding: 6px 10px; border-bottom: var(--df-border-width) solid var(--df-border); font-weight: 700; }
+.df-td { padding: 6px 10px; border-bottom: 1px solid var(--df-grid-line); }
+.df-tr--baseline { color: var(--df-muted); }
+.df-diff { font-size: var(--df-text-xs); padding: 0 4px; border-radius: 4px; }
+.df-diff--up { color: var(--df-pos); }
+.df-diff--down { color: var(--df-neg); }
+
+/* comparison */
+.df-comparison { display: flex; flex-direction: column; gap: 4px; height: 100%; }
+.df-cmp-title { font-size: var(--df-text-sm); color: var(--df-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.df-cmp-row { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--df-grid-line); }
+.df-cmp-head { color: var(--df-muted); font-size: var(--df-text-xs); text-transform: uppercase; letter-spacing: 0.06em; }
+.df-cmp-label { font-weight: 600; }
+.df-cmp-before { color: var(--df-muted); }
+.df-cmp-after { font-weight: 700; }
+.df-cmp-delta { font-size: var(--df-text-xs); font-weight: 600; }
+.df-cmp-delta--pos { color: var(--df-pos); }
+.df-cmp-delta--neg { color: var(--df-neg); }
+
+/* media */
+.df-media { margin: 0; height: 100%; position: relative; }
+.df-media-el { width: 100%; height: 100%; display: block; }
+.df-media-caption { position: absolute; left: 0; bottom: 0; right: 0; padding: 8px 12px; background: rgba(0,0,0,0.55); color: #fff; font-size: var(--df-text-sm); }
+
+/* code-diff */
+.df-code { font-family: var(--df-font-mono); height: 100%; display: flex; flex-direction: column; font-size: var(--df-text-sm); }
+.df-code-header { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; color: var(--df-muted); }
+.df-code-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--df-accent); display: inline-block; }
+.df-code-lang { margin-left: auto; font-size: var(--df-text-xs); text-transform: uppercase; }
+.df-code-body { margin: 0; overflow: hidden; }
+.df-line { display: flex; gap: 8px; padding: 1px 0; }
+.df-line--add { background: color-mix(in srgb, var(--df-pos) 16%, transparent); }
+.df-line--del { background: color-mix(in srgb, var(--df-neg) 16%, transparent); }
+.df-gutter { width: 1ch; color: var(--df-muted); user-select: none; }
+
+/* terminal */
+.df-terminal { font-family: var(--df-font-mono); background: #0c0c10; color: #d6f5d6; height: 100%; border-radius: var(--df-radius); overflow: hidden; display: flex; flex-direction: column; }
+.df-term-header { display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: rgba(255,255,255,0.06); color: #aaa; font-size: var(--df-text-xs); }
+.df-term-dot { width: 10px; height: 10px; border-radius: 50%; background: #555; display: inline-block; }
+.df-term-body { padding: 10px 12px; font-size: var(--df-text-sm); overflow: hidden; }
+.df-term-prompt { color: var(--df-accent); }
+.df-term-cmd { color: #fff; }
+.df-term-out { margin: 2px 0 8px; color: #9fe89f; white-space: pre-wrap; }
+.df-term-cursor { display: inline-block; width: 8px; height: 1em; background: #d6f5d6; vertical-align: text-bottom; }
+
+/* tier-2 placeholder card */
+.df-card { height: 100%; display: flex; flex-direction: column; gap: 8px; }
+.df-card-tag { font-size: var(--df-text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--df-accent); font-weight: 700; }
+.df-card-body { margin: 0; flex: 1; overflow: hidden; font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-muted); white-space: pre-wrap; }
+.df-card-note { font-size: var(--df-text-xs); color: var(--df-muted); font-style: italic; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+</head>
+<body style="margin:0">
+<div class="df-stage" data-composition-id="sample" data-width="1920" data-height="1080" style="position:relative;width:1920px;height:1080px;overflow:hidden">
+<div class="df-scene" data-composition-id="sample" data-track-index="0"
+     data-start="0" data-duration="3"
+     style="display:grid;grid-template-columns:repeat(1,1fr);grid-template-rows:repeat(1,1fr);gap:24px;padding:24px;background:#ffffff;">
+<div id="df-panel-p-title" class="df-panel" data-composition-id="sample"
+     data-track-index="1" data-start="0" data-duration="3"
+     style="grid-column:1 / span 1;grid-row:1 / span 1;">
+<div class="df-text df-text--title" style="text-align:left"><div class="df-title">Model v2 Results</div><div class="df-subtitle">+9 F1 over baseline</div></div>
+</div>
+</div>
+<div class="df-scene" data-composition-id="sample" data-track-index="0"
+     data-start="3" data-duration="6"
+     style="display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(1,1fr);gap:24px;padding:24px;">
+<div id="df-panel-p-chart" class="df-panel" data-composition-id="sample"
+     data-track-index="1" data-start="3" data-duration="6"
+     style="grid-column:1 / span 1;grid-row:1 / span 1;">
+<div class="df-chart df-chart--bar"><div class="df-chart-title">F1 by checkpoint</div><div class="df-chart-plot"><div class="df-bar-group"><div class="df-bars"><div class="df-bar" style="height:80.68%;"><span class="df-bar-label">0.71</span></div></div><span class="df-axis-x">ckpt-1k</span></div><div class="df-bar-group"><div class="df-bars"><div class="df-bar" style="height:89.77%;"><span class="df-bar-label">0.79</span></div></div><span class="df-axis-x">ckpt-5k</span></div><div class="df-bar-group"><div class="df-bars"><div class="df-bar" style="height:95.45%;"><span class="df-bar-label">0.84</span></div></div><span class="df-axis-x">ckpt-10k</span></div><div class="df-bar-group"><div class="df-bars"><div class="df-bar" style="height:100.00%;"><span class="df-bar-label">0.88</span></div></div><span class="df-axis-x">ckpt-20k</span></div></div></div>
+</div>
+<div id="df-panel-p-table" class="df-panel" data-composition-id="sample"
+     data-track-index="2" data-start="3.5" data-duration="5.5"
+     style="grid-column:2 / span 1;grid-row:1 / span 1;">
+<div class="df-table-wrap"><table class="df-table"><caption class="df-table-title">Per-class metrics</caption><thead><tr><th class="df-th" style="text-align:left">Class</th><th class="df-th" style="text-align:right">P</th><th class="df-th" style="text-align:right">R</th><th class="df-th" style="text-align:right">F1</th></tr></thead><tbody><tr class="df-tr df-tr--baseline"><td class="df-td" style="text-align:left">PERSON</td><td class="df-td" style="text-align:right">0.88</td><td class="df-td" style="text-align:right">0.84</td><td class="df-td" style="text-align:right">0.86</td></tr><tr class="df-tr"><td class="df-td" style="text-align:left">ORG</td><td class="df-td" style="text-align:right">0.81 <span class="df-diff df-diff--down">▼0.07</span></td><td class="df-td" style="text-align:right">0.79 <span class="df-diff df-diff--down">▼0.05</span></td><td class="df-td" style="text-align:right">0.80 <span class="df-diff df-diff--down">▼0.06</span></td></tr><tr class="df-tr"><td class="df-td" style="text-align:left">LOC</td><td class="df-td" style="text-align:right">0.92 <span class="df-diff df-diff--up">▲0.04</span></td><td class="df-td" style="text-align:right">0.90 <span class="df-diff df-diff--up">▲0.06</span></td><td class="df-td" style="text-align:right">0.91 <span class="df-diff df-diff--up">▲0.05</span></td></tr></tbody></table></div>
+</div>
+</div>
+</div>
+<script>
+(function(){
+  var steps = [{"sel":"#df-panel-p-title","op":"from","to":{"opacity":0},"at":0,"dur":0.4,"ease":"power2.out"},{"sel":"#df-panel-p-title .df-title","op":"from","to":{"opacity":0,"y":12},"at":0,"dur":0.4},{"sel":"#df-panel-p-title .df-subtitle","op":"from","to":{"opacity":0,"y":12},"at":0.08,"dur":0.4},{"sel":"#df-panel-p-chart","op":"from","to":{"opacity":0,"y":28},"at":3,"dur":0.4,"ease":"power2.out"},{"sel":"#df-panel-p-chart .df-bar","op":"fromTo","to":{"scaleY":1,"stagger":0.08,"ease":"power2.out"},"at":3,"dur":0.5,"from":{"scaleY":0}},{"sel":"#df-panel-p-table","op":"from","to":{"opacity":0},"at":3.5,"dur":0.4,"ease":"power2.out"},{"sel":"#df-panel-p-table .df-tr","op":"from","to":{"opacity":0,"y":10,"stagger":0.08},"at":3.6,"dur":0.4}];
+  function build(){
+    if (typeof window === 'undefined' || !window.gsap) return false;
+    var tl = window.gsap.timeline({ paused: true });
+    steps.forEach(function(s){
+      var vars = Object.assign({}, s.to, { duration: s.dur });
+      if (s.ease) vars.ease = s.ease;
+      if (s.op === 'set') { tl.set(s.sel, s.to, s.at); }
+      else if (s.op === 'fromTo') { tl.fromTo(s.sel, s.from, vars, s.at); }
+      else { tl[s.op](s.sel, vars, s.at); }
+    });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["sample"] = tl;
+    return true;
+  }
+  if (!build() && typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', build);
+  }
+})();
+</script>
+</body>
+</html>"
+`;
