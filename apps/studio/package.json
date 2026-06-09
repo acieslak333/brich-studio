@@ -1,0 +1,10 @@
+{
+  "name": "@demoforge/studio",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Editor UI (Next.js App Router) — scaffolded in milestone M4",
+  "scripts": {
+    "dev": "echo \"studio UI lands in M4 (see README)\" && exit 0"
+  }
+}

@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+.next/
+out/
+
+# test / coverage
+coverage/
+.vitest/
+
+# user project data (per §4 of the build prompt: projects/ is gitignored)
+projects/
+
+# rendered video output
+**/renders/
+*.mp4
+*.webm
+*.gif
+
+# hyperframes smoke-test scratch dir
+_smoketest/
+
+# env & secrets (server-side only, never committed)
+.env
+.env.*
+!.env.example
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log

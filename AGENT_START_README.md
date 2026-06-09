@@ -1,6 +1,22 @@
 # Build Prompt — "DemoForge": Local, Prompt-Driven Technical Demo Video Studio on HyperFrames
 
-> Paste this whole document into a coding agent (Claude Code, Cursor, Codex, Gemini CLI). It is the spec **and** the working agreement. Build in the milestone order given; each milestone has a Definition of Done you must satisfy before moving on. "DemoForge" is a placeholder name — rename freely.
+> Paste this whole document into a coding agent (Claude Code, Cursor, Codex, Gemini CLI). It is the spec **and** the working agreement. Build in the milestone order given; each milestone has a Definition of Done you must satisfy before moving on. "DemoForge" is a placeholder name — rename freely. Codename **DemoForge**; the repository is **`acieslak333/brich-studio`** (packages currently use the `@demoforge/*` scope; rename later if desired).
+
+---
+
+## Repository, authorship & push rules (READ FIRST)
+
+These rules govern **every** commit and push in this repo. Configure them before doing any work.
+
+- **Identity.** All commits and pushes MUST be authored as the repository owner — never as "Claude", "Claude Code", an AI assistant, or `noreply@anthropic.com`:
+  ```bash
+  git config user.name  "acieslak333"
+  git config user.email "adam.cieslak333@gmail.com"
+  ```
+- **No AI/model identifiers** in commit messages, PR titles/bodies, code comments, or any other pushed artifact. Keep the history looking like the owner's own work.
+- **Branch.** Develop on the designated feature branch and `git push -u origin <branch>` there. Create the branch locally if needed. Never push to `main` without explicit permission.
+- **No PRs unless asked.** Do not open a pull request unless the user explicitly requests one.
+- **Build status** is tracked in [`PROGRESS.md`](./PROGRESS.md); update it as milestones land.
 
 ---
 
@@ -365,4 +381,4 @@ npx hyperframes init _smoketest && cd _smoketest && npx hyperframes render && cd
 ```
 Then read `@hyperframes/core` types + the HyperFrames docs, confirm the composition/timeline/audio contract, and only then implement `packages/schema` and `packages/compiler` (M1).
 
-**Working rules:** commit per milestone; write tests as you go (compiler snapshots, schema validation, one render smoke test in CI/Docker); keep the simulated path fully offline; never block on cloud keys; ask the user only if a milestone's DoD is genuinely ambiguous.
+**Working rules:** commit per milestone; **author every commit as the repo owner** (see *Repository, authorship & push rules* above — never as Claude/Claude Code/Anthropic); write tests as you go (compiler snapshots, schema validation, one render smoke test in CI/Docker); keep the simulated path fully offline; never block on cloud keys; ask the user only if a milestone's DoD is genuinely ambiguous.

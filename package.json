@@ -1,0 +1,22 @@
+{
+  "name": "demoforge",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Local-first, prompt-driven technical demo video studio on HyperFrames",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r --filter=./packages/* build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "echo \"(lint not configured yet)\""
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}
