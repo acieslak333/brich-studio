@@ -40,9 +40,21 @@ const { html, manifest, warnings } = compile(project);
    steps serialized into one deterministic builder script.
 5. **Document** — theme tokens (scoped to `.df-stage`) + base CSS + GSAP + body.
 
-## ⚠️ Verify-before-render
+## Verified against HyperFrames v0.6.84
 
-This follows the **documented** HyperFrames contract (`data-*` timing attributes,
-`window.__timelines[<compositionId>]`). Before wiring real renders (M0), confirm
-the exact attribute semantics and timeline-registration shape against the
-installed `@hyperframes/core`, and run `hyperframes lint` on the output.
+The output is confirmed against the installed toolchain (agent skill + a real
+`hyperframes init` scaffold) and **renders lint-clean to MP4**:
+
+- Every timed element carries **`class="clip"`** (the framework's visibility
+  control) plus `data-start`/`data-duration`/`data-track-index`.
+- **`data-composition-id` is only on the root** stage div; putting it on regular
+  clips makes the engine poll for a per-element timeline (a 45 s headless stall).
+- The root carries `data-start="0"` and `data-duration` (total); same-track
+  clips never overlap in time; visual layering is CSS `z-index`.
+- **GSAP is referenced locally** (`gsap.min.js`), not via CDN — the render
+  sandbox blocks external hosts and offline/deterministic rendering is the rule
+  (§1A). The render pipeline vendors the file next to `index.html`.
+- Font families are emitted as **literal names** (not `var(--df-font-*)`) so the
+  HyperFrames font scanner embeds the right `.woff2`.
+
+Run `hyperframes lint` (the render path uses `--strict`) before every render.

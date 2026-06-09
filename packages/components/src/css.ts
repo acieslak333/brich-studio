@@ -7,7 +7,8 @@
 export const BASE_CSS = String.raw`
 *, *::before, *::after { box-sizing: border-box; }
 .df-stage {
-  font-family: var(--df-font-sans);
+  /* font-family is set per-theme by the compiler with literal names so the
+     HyperFrames font scanner can embed the .woff2 (it can't resolve var()). */
   color: var(--df-fg);
   background: var(--df-bg);
 }
@@ -80,7 +81,7 @@ export const BASE_CSS = String.raw`
 .df-media-caption { position: absolute; left: 0; bottom: 0; right: 0; padding: 8px 12px; background: rgba(0,0,0,0.55); color: #fff; font-size: var(--df-text-sm); }
 
 /* code-diff */
-.df-code { font-family: var(--df-font-mono); height: 100%; display: flex; flex-direction: column; font-size: var(--df-text-sm); }
+.df-code { height: 100%; display: flex; flex-direction: column; font-size: var(--df-text-sm); }
 .df-code-header { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; color: var(--df-muted); }
 .df-code-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--df-accent); display: inline-block; }
 .df-code-lang { margin-left: auto; font-size: var(--df-text-xs); text-transform: uppercase; }
@@ -91,7 +92,7 @@ export const BASE_CSS = String.raw`
 .df-gutter { width: 1ch; color: var(--df-muted); user-select: none; }
 
 /* terminal */
-.df-terminal { font-family: var(--df-font-mono); background: #0c0c10; color: #d6f5d6; height: 100%; border-radius: var(--df-radius); overflow: hidden; display: flex; flex-direction: column; }
+.df-terminal { background: #0c0c10; color: #d6f5d6; height: 100%; border-radius: var(--df-radius); overflow: hidden; display: flex; flex-direction: column; }
 .df-term-header { display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: rgba(255,255,255,0.06); color: #aaa; font-size: var(--df-text-xs); }
 .df-term-dot { width: 10px; height: 10px; border-radius: 50%; background: #555; display: inline-block; }
 .df-term-body { padding: 10px 12px; font-size: var(--df-text-sm); overflow: hidden; }
@@ -103,6 +104,6 @@ export const BASE_CSS = String.raw`
 /* tier-2 placeholder card */
 .df-card { height: 100%; display: flex; flex-direction: column; gap: 8px; }
 .df-card-tag { font-size: var(--df-text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--df-accent); font-weight: 700; }
-.df-card-body { margin: 0; flex: 1; overflow: hidden; font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-muted); white-space: pre-wrap; }
+.df-card-body { margin: 0; flex: 1; overflow: hidden; font-size: var(--df-text-xs); color: var(--df-muted); white-space: pre-wrap; }
 .df-card-note { font-size: var(--df-text-xs); color: var(--df-muted); font-style: italic; }
 `.trim();

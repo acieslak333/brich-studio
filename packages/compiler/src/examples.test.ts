@@ -28,11 +28,15 @@ describe("examples/results-demo.json", () => {
     expect(a.html).toContain('id="df-panel-term"');
   });
 
-  it("lays the two scenes back-to-back (0..3, 3..10)", () => {
+  it("lays the two scenes back-to-back (total 10s)", () => {
     const result = parseProject(demo);
     if (!result.ok) throw result.error;
-    const { html } = compile(result.project);
-    expect(html).toMatch(/df-scene[^>]*data-start="0"[^>]*data-duration="3"/s);
-    expect(html).toMatch(/df-scene[^>]*data-start="3"[^>]*data-duration="7"/s);
+    const { html, durationSec } = compile(result.project);
+    expect(durationSec).toBe(10);
+    // root duration is the sum of scene durations (3 + 7)
+    expect(html).toMatch(/df-stage[^>]*data-start="0"[^>]*data-duration="10"/s);
+    // scene-1 gradient background clip at 0..3; scene-2 chart panel starts at 3
+    expect(html).toMatch(/df-bg-s-title[^>]*data-start="0"[^>]*data-duration="3"/s);
+    expect(html).toMatch(/df-panel-chart[^>]*data-start="3"/s);
   });
 });

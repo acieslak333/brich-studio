@@ -17,12 +17,15 @@ describe("compile", () => {
     expect(html).toContain("width:1920px;height:1080px");
   });
 
-  it("places scenes at cumulative offsets", () => {
+  it("emits one root composition with total duration and class=clip children", () => {
     const { html } = compile(sampleProject());
-    // scene 1 at 0 (dur 3), scene 2 at 3 (dur 6)
-    expect(html).toContain('class="df-scene"');
-    expect(html).toMatch(/df-scene[^>]*data-start="0"[^>]*data-duration="3"/s);
-    expect(html).toMatch(/df-scene[^>]*data-start="3"[^>]*data-duration="6"/s);
+    // root composition: data-start=0, data-duration = 3 + 6
+    expect(html).toMatch(/df-stage[^>]*data-start="0"[^>]*data-duration="9"/s);
+    // no nested scene wrappers; flat clips instead
+    expect(html).not.toContain('class="df-scene"');
+    expect(html).toContain('class="df-panel clip"');
+    // scene-1 solid background becomes a flat clip at 0..3
+    expect(html).toMatch(/df-bg-scene-title[^>]*data-start="0"[^>]*data-duration="3"/s);
   });
 
   it("gives panels absolute timing relative to their scene", () => {
