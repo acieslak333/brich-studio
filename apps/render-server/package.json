@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "tsx src/cli.ts",
     "render": "tsx src/cli-render.ts",
+    "render-batch": "tsx src/cli-batch.ts",
     "start": "tsx src/server.ts",
     "dev": "tsx watch src/server.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"

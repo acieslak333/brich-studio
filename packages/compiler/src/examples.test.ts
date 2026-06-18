@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { parseProject } from "@demoforge/schema";
 import { compile } from "./compile.js";
 import demo from "../../../examples/results-demo.json";
+import batchDemo from "../../../examples/batch-demo.json";
 
 /**
  * M1 DoD: a hand-written 2-scene example validates and compiles with correct
@@ -38,5 +39,22 @@ describe("examples/results-demo.json", () => {
     // scene-1 gradient background clip at 0..3; scene-2 chart panel starts at 3
     expect(html).toMatch(/df-bg-s-title[^>]*data-start="0"[^>]*data-duration="3"/s);
     expect(html).toMatch(/df-panel-chart[^>]*data-start="3"/s);
+  });
+});
+
+describe("examples/batch-demo.json", () => {
+  it("validates and resolves whole-string numeric var refs per row", () => {
+    const result = parseProject(batchDemo);
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw result.error;
+    const html = compile(result.project, {
+      bindings: { modelName: "roberta-large", f1: 0.91, acc: 0.92, lat: 240 },
+    }).html;
+    // title + comparison "after" label use {{modelName}}
+    expect(html).toContain("roberta-large");
+    // counter chart + comparison "after" resolve {{f1}} to the number 0.91
+    expect(html).toContain("0.91");
+    // no unresolved references leak into the render
+    expect(html).not.toContain("{{");
   });
 });

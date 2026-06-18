@@ -61,10 +61,16 @@ Placeholder package only (`apps/studio`).
 `packages/llm` not started. Schema's `formatIssues` is ready to drive the
 validate→repair loop.
 
-## M5.1 — Variables & batch render · 🟡
-- ✅ `{{var}}` references resolve in the compiler (per-row bindings supported via
-  `compile(project, { bindings })`).
-- ⬜ The `/render/batch` endpoint + dataset (CSV/JSON) → one video per row.
+## M5.1 — Variables & batch render · ✅
+- ✅ `{{var}}` references resolve in the compiler — whole-string refs are
+  type-preserving (a `"{{f1}}"` becomes the number `0.91`, feeding chart/diff
+  math), inline refs interpolate as text.
+- ✅ Dataset parsing (CSV + JSON, numeric/boolean coercion) in the compiler.
+- ✅ `renderBatch` + a `render-batch` CLI + `POST /render/batch` (inline dataset
+  or path) → one video per row, output dirs named by a key column.
+- ✅ **DoD met:** `examples/batch-demo.json` + `examples/models.csv` (3 rows) →
+  3 distinct, correct MP4s in one run (verified: bert-base / roberta-large /
+  distilbert render different F1, accuracy, and latency in labels and metrics).
 
 ## M6 — Real providers + Tier-2 blocks · ⬜
 `packages/providers` not started; Tier-2 blocks use the placeholder emitter.
@@ -89,6 +95,12 @@ pnpm --filter @demoforge/render-server compile \
 pnpm --filter @demoforge/render-server render \
   "$PWD/examples/results-demo.json" "$PWD/projects/results-demo/render" draft
 # → projects/results-demo/render/results-demo.mp4  (1920×1080, glass-neon, animated)
+
+# batch render: one video per dataset row (M5.1):
+pnpm --filter @demoforge/render-server render-batch \
+  "$PWD/examples/batch-demo.json" "$PWD/examples/models.csv" \
+  "$PWD/projects/model-card/batch" draft
+# → projects/model-card/batch/{bert-base,roberta-large,distilbert}/*.mp4
 ```
 
 One-time render prerequisites: `npx hyperframes browser ensure` (downloads the

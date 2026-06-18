@@ -1,0 +1,4 @@
+modelName,f1,acc,lat
+bert-base,0.86,0.88,180
+roberta-large,0.91,0.92,240
+distilbert,0.83,0.85,90

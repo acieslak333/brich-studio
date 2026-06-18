@@ -1,5 +1,8 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { compileToDisk, renderProject } from "./pipeline.js";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { compileToDisk, renderBatch, renderProject } from "./pipeline.js";
 
 /**
  * Minimal render service (§12). Exposes a health check and a `/render` endpoint
@@ -60,9 +63,34 @@ const server = createServer(async (req, res) => {
       return json(res, 200, { ok: true, ...result });
     }
 
+    // POST /render/batch { projectPath, datasetPath | dataset, quality?, ... }
+    if (req.method === "POST" && req.url === "/render/batch") {
+      const body = await readBody(req);
+      const opts = JSON.parse(body || "{}") as {
+        projectPath?: string;
+        datasetPath?: string;
+        dataset?: string;
+        outDir?: string;
+        quality?: "draft" | "standard" | "high";
+        fps?: 24 | 30 | 60;
+        format?: "mp4" | "webm";
+      };
+      if (!opts.projectPath) return json(res, 400, { error: "projectPath is required" });
+      // Accept an inline dataset string or a path on disk.
+      let datasetPath = opts.datasetPath;
+      if (!datasetPath && opts.dataset) {
+        const ext = opts.dataset.trimStart().startsWith("[") ? "json" : "csv";
+        datasetPath = join(mkdtempSync(join(tmpdir(), "df-ds-")), `dataset.${ext}`);
+        writeFileSync(datasetPath, opts.dataset, "utf8");
+      }
+      if (!datasetPath) return json(res, 400, { error: "datasetPath or dataset is required" });
+      const results = await renderBatch(opts.projectPath, datasetPath, opts);
+      return json(res, 200, { ok: true, count: results.length, results });
+    }
+
     return json(res, 404, {
       error: "not found",
-      routes: ["/health", "POST /compile", "POST /render"],
+      routes: ["/health", "POST /compile", "POST /render", "POST /render/batch"],
     });
   } catch (err) {
     return json(res, 500, { error: err instanceof Error ? err.message : String(err) });

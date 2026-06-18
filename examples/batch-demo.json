@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "model-card",
+  "name": "Model Card",
+  "theme": "glass-neon",
+  "output": { "width": 1920, "height": 1080, "fps": 30, "format": "mp4", "aspect": "16:9" },
+  "assets": [],
+  "variables": [
+    { "name": "modelName", "type": "string", "default": "baseline" },
+    { "name": "f1", "type": "number", "default": 0.79 },
+    { "name": "acc", "type": "number", "default": 0.82 },
+    { "name": "lat", "type": "number", "default": 240 }
+  ],
+  "sequence": [
+    {
+      "id": "s-title",
+      "name": "Title",
+      "durationSec": 2.5,
+      "background": { "kind": "gradient", "from": "#0a0b14", "to": "#1a1140", "angleDeg": 160 },
+      "layout": { "columns": 1, "rows": 1, "gapPx": 48 },
+      "panels": [
+        {
+          "id": "title",
+          "colStart": 1, "colSpan": 1, "rowStart": 1, "rowSpan": 1,
+          "startSec": 0, "durationSec": 2.5, "enter": "fade",
+          "component": {
+            "type": "text",
+            "props": { "variant": "title", "align": "left" },
+            "data": { "title": "{{modelName}}", "subtitle": "F1 {{f1}} · acc {{acc}} · {{lat}}ms" }
+          }
+        }
+      ]
+    },
+    {
+      "id": "s-card",
+      "name": "Card",
+      "durationSec": 5,
+      "layout": { "columns": 2, "rows": 1, "gapPx": 24 },
+      "panels": [
+        {
+          "id": "compare",
+          "colStart": 1, "colSpan": 1, "rowStart": 1, "rowSpan": 1,
+          "startSec": 0, "durationSec": 5, "enter": "slide-up",
+          "component": {
+            "type": "comparison",
+            "props": { "mode": "metrics", "title": "Baseline vs {{modelName}}", "beforeLabel": "base", "afterLabel": "{{modelName}}" },
+            "data": { "metrics": [
+              { "label": "Accuracy", "before": 0.82, "after": "{{acc}}" },
+              { "label": "F1", "before": 0.79, "after": "{{f1}}" },
+              { "label": "Latency", "before": 240, "after": "{{lat}}", "unit": "ms", "higherIsBetter": false }
+            ] }
+          }
+        },
+        {
+          "id": "f1",
+          "colStart": 2, "colSpan": 1, "rowStart": 1, "rowSpan": 1,
+          "startSec": 0.4, "durationSec": 4.6, "enter": "scale",
+          "component": {
+            "type": "chart",
+            "props": { "kind": "counter", "title": "F1" },
+            "data": { "series": [ { "name": "F1", "points": [ { "x": "F1", "y": "{{f1}}" } ] } ] }
+          }
+        }
+      ]
+    }
+  ]
+}

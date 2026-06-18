@@ -2,7 +2,13 @@ import { readFileSync, mkdirSync, writeFileSync, copyFileSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { createRequire } from "node:module";
 import { formatIssues, parseProject, type Project } from "@demoforge/schema";
-import { compile } from "@demoforge/compiler";
+import {
+  compile,
+  defaultBindings,
+  inferDatasetFormat,
+  parseDataset,
+  type Bindings,
+} from "@demoforge/compiler";
 import { renderToMp4, type RenderToMp4Args } from "./render.js";
 
 const require = createRequire(import.meta.url);
@@ -43,9 +49,18 @@ export function loadProject(path: string): Project {
 export function compileToDisk(
   projectPath: string,
   outDirArg?: string,
+  bindings?: Bindings,
 ): CompileToDiskResult {
-  const project = loadProject(projectPath);
-  const result = compile(project);
+  return writeProjectDir(loadProject(projectPath), outDirArg, bindings);
+}
+
+/** Compile an already-loaded project to a render-ready dir (with bindings). */
+export function writeProjectDir(
+  project: Project,
+  outDirArg?: string,
+  bindings?: Bindings,
+): CompileToDiskResult {
+  const result = compile(project, bindings ? { bindings } : {});
   const outDir =
     outDirArg ?? resolve(process.cwd(), "projects", project.id, "compiled");
   mkdirSync(outDir, { recursive: true });
@@ -101,10 +116,11 @@ export async function renderProject(
     quality?: RenderToMp4Args["quality"];
     fps?: RenderToMp4Args["fps"];
     format?: RenderToMp4Args["format"];
+    bindings?: Bindings;
     onLog?: (line: string) => void;
   } = {},
 ): Promise<RenderProjectResult> {
-  const compiled = compileToDisk(projectPath, opts.outDir);
+  const compiled = compileToDisk(projectPath, opts.outDir, opts.bindings);
   const outPath =
     opts.outPath ?? join(compiled.outDir, `${compiled.compositionId}.${opts.format ?? "mp4"}`);
   const mp4Path = await renderToMp4({
@@ -116,4 +132,70 @@ export async function renderProject(
     onLog: opts.onLog,
   });
   return { ...compiled, mp4Path };
+}
+
+export interface BatchRowResult {
+  index: number;
+  key: string;
+  bindings: Bindings;
+  outDir: string;
+  mp4Path: string;
+  warnings: string[];
+}
+
+/** Filesystem-safe slug for a row key. */
+function slug(value: unknown, fallback: string): string {
+  const s = String(value ?? "").trim();
+  const cleaned = s.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
+  return cleaned.length ? cleaned : fallback;
+}
+
+/**
+ * Batch render (§12, M5.1): one template + a CSV/JSON dataset → one video per
+ * row. Each row's fields override the project's variable defaults, mapping onto
+ * the same `{{var}}` resolution the single render uses.
+ */
+export async function renderBatch(
+  projectPath: string,
+  datasetPath: string,
+  opts: {
+    outDir?: string;
+    quality?: RenderToMp4Args["quality"];
+    fps?: RenderToMp4Args["fps"];
+    format?: RenderToMp4Args["format"];
+    /** Row field used to name each output dir (default "modelName" then "id"). */
+    keyField?: string;
+    onLog?: (line: string) => void;
+  } = {},
+): Promise<BatchRowResult[]> {
+  const project = loadProject(projectPath);
+  const defaults = defaultBindings(project);
+  const rows = parseDataset(readFileSync(datasetPath, "utf8"), inferDatasetFormat(datasetPath));
+  if (rows.length === 0) throw new Error(`dataset is empty: ${datasetPath}`);
+
+  const baseOutDir =
+    opts.outDir ?? resolve(process.cwd(), "projects", project.id, "batch");
+  const format = opts.format ?? "mp4";
+  const keyField = opts.keyField ?? (rows[0]!.modelName !== undefined ? "modelName" : "id");
+
+  const results: BatchRowResult[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]!;
+    const bindings: Bindings = { ...defaults, ...row };
+    const key = slug(row[keyField], `row-${i}`);
+    const rowDir = join(baseOutDir, key);
+    const compiled = writeProjectDir(project, rowDir, bindings);
+    const outPath = join(rowDir, `${slug(project.id, "video")}-${key}.${format}`);
+    opts.onLog?.(`\n[batch ${i + 1}/${rows.length}] ${key}\n`);
+    const mp4Path = await renderToMp4({
+      projectDir: rowDir,
+      outPath,
+      quality: opts.quality,
+      fps: opts.fps,
+      format: opts.format,
+      onLog: opts.onLog,
+    });
+    results.push({ index: i, key, bindings, outDir: rowDir, mp4Path, warnings: compiled.warnings });
+  }
+  return results;
 }

@@ -11,11 +11,13 @@ produces a video per model / run / checkpoint.
 
 ## Status
 
-Foundation working end-to-end (M0 ✅, M1 mostly ✅): the **schema** (project
-model) and **compiler** (project → HyperFrames composition) are built, tested,
-and deterministic, and a project **renders to a real MP4** through the
+Foundation working end-to-end (M0 ✅, M1 mostly ✅, M5.1 ✅): the **schema**
+(project model) and **compiler** (project → HyperFrames composition) are built,
+tested, and deterministic, and a project **renders to a real MP4** through the
 HyperFrames toolchain (lint-clean, animated, fonts embedded, variables
-resolved). See `PROGRESS.md` for the per-milestone breakdown.
+resolved). **Batch rendering** turns one template + a CSV/JSON dataset into one
+video per row — the headline use case for an ML team (one results video per
+model / run / checkpoint). See `PROGRESS.md` for the per-milestone breakdown.
 
 ## Requirements
 
@@ -41,10 +43,16 @@ pnpm --filter @demoforge/render-server render \
   "$PWD/examples/results-demo.json" "$PWD/projects/results-demo/render" draft
 # → projects/results-demo/render/results-demo.mp4
 
+# batch render — one video per dataset row (one results video per model/run):
+pnpm --filter @demoforge/render-server render-batch \
+  "$PWD/examples/batch-demo.json" "$PWD/examples/models.csv" \
+  "$PWD/projects/model-card/batch" draft
+
 # or run the render service:
 pnpm --filter @demoforge/render-server start
-#   POST /compile { "projectPath": "..." }            → composition only
-#   POST /render  { "projectPath": "...", "quality": "draft" }  → MP4
+#   POST /compile      { "projectPath": "..." }                      → composition only
+#   POST /render       { "projectPath": "...", "quality": "draft" }  → MP4
+#   POST /render/batch { "projectPath": "...", "dataset": "csv-or-json" } → one MP4/row
 ```
 
 ## Layout
